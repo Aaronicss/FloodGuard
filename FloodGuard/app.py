@@ -186,7 +186,7 @@ elif authenticator_status is True:
 
 
     # Load GeoJSON file
-    geojson_path = "barangays-municity-ph042103000.0.1.json"
+    geojson_path = "FloodGuard/barangays-municity-ph042103000.0.1.json"
     with open(geojson_path, 'r') as f:
         geojson_data = json.load(f)
 

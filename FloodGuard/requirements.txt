@@ -1,2 +1,2 @@
-!pip install streamlit
-!pip install streamlit-authenticator==0.1.5 
+streamlit
+streamlit-authenticator==0.1.5 

@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 st.title("Welcome to Flood Guard")
-st.image("logo.png",width=500)
+st.image("FloodGuard/logo.png",width=500)
 
 # --- USER AUTHENTICATION ---
 names = ["Aaron Lazaro", "Gabriel"]

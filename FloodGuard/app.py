@@ -194,7 +194,7 @@ elif authenticator_status is True:
     features = geojson_data['features']
     properties = [feature['properties'] for feature in features]
     barangays = [prop['ADM4_EN'] for prop in properties]
-    flood_path = "2024-12-03T11-38_export.csv"
+    flood_path = "FloodGuard/2024-12-03T11-38_export.csv"
     data = pd.read_csv(flood_path)  # Automatically handles headers
 
     # Plotly Choropleth Map

@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>generate_keys.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+generate_keys.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pickle</span>
+<span class="s0">from </span><span class="s1">pathlib </span><span class="s0">import </span><span class="s1">Path</span>
+
+<span class="s0">import </span><span class="s1">streamlit_authenticator </span><span class="s0">as </span><span class="s1">stauth</span>
+
+<span class="s1">names </span><span class="s2">= [</span><span class="s3">&quot;Aaron Lazaro&quot;</span><span class="s2">, </span><span class="s3">&quot;Gabriel&quot;</span><span class="s2">]</span>
+<span class="s1">usernames </span><span class="s2">= [</span><span class="s3">&quot;ronron&quot;</span><span class="s2">, </span><span class="s3">&quot;gabby&quot;</span><span class="s2">]</span>
+<span class="s1">passwords </span><span class="s2">= [</span><span class="s3">&quot;XXX&quot;</span><span class="s2">,</span><span class="s3">&quot;XXX&quot;</span><span class="s2">]</span>
+
+<span class="s1">hashed_passwords </span><span class="s2">= </span><span class="s1">stauth</span><span class="s2">.</span><span class="s1">Hasher</span><span class="s2">(</span><span class="s1">passwords</span><span class="s2">).</span><span class="s1">generate</span><span class="s2">()</span>
+
+<span class="s1">file_path </span><span class="s2">= </span><span class="s1">Path</span><span class="s2">(</span><span class="s1">__file__</span><span class="s2">).</span><span class="s1">parent </span><span class="s2">/ </span><span class="s3">&quot;hashed_pw.pkl&quot;</span>
+<span class="s0">with </span><span class="s1">file_path</span><span class="s2">.</span><span class="s1">open</span><span class="s2">(</span><span class="s3">&quot;wb&quot;</span><span class="s2">) </span><span class="s0">as </span><span class="s1">file</span><span class="s2">:</span>
+    <span class="s1">pickle</span><span class="s2">.</span><span class="s1">dump</span><span class="s2">(</span><span class="s1">hashed_passwords</span><span class="s2">, </span><span class="s1">file</span><span class="s2">)</span>
+
+
+</pre>
+</body>
+</html>

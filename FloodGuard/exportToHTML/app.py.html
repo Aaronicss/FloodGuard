@@ -1,0 +1,211 @@
+<html>
+<head>
+<title>app.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+app.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">requests</span>
+<span class="s0">import </span><span class="s1">streamlit </span><span class="s0">as </span><span class="s1">st</span>
+<span class="s0">import </span><span class="s1">pickle</span>
+<span class="s0">from </span><span class="s1">pathlib </span><span class="s0">import </span><span class="s1">Path</span>
+<span class="s0">import </span><span class="s1">streamlit_authenticator </span><span class="s0">as </span><span class="s1">stauth</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">from </span><span class="s1">datetime </span><span class="s0">import </span><span class="s1">datetime</span><span class="s2">, </span><span class="s1">timedelta</span>
+
+
+<span class="s3"># --- PAGE CONFIGURATION ---</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">set_page_config</span><span class="s2">(</span>
+    <span class="s1">page_title</span><span class="s2">=</span><span class="s4">&quot;FloodGuard&quot;</span><span class="s2">,</span>
+    <span class="s1">page_icon</span><span class="s2">=</span><span class="s4">&quot;🌊&quot;</span><span class="s2">,</span>
+<span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;Welcome to Flood Guard&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">image</span><span class="s2">(</span><span class="s4">&quot;logo.jpg&quot;</span><span class="s2">,</span><span class="s1">width</span><span class="s2">=</span><span class="s5">200</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">success</span><span class="s2">(</span><span class="s4">&quot;Select a page above.&quot;</span><span class="s2">)</span>
+
+<span class="s3"># --- USER AUTHENTICATION ---</span>
+<span class="s1">names </span><span class="s2">= [</span><span class="s4">&quot;Aaron Lazaro&quot;</span><span class="s2">, </span><span class="s4">&quot;Gabriel&quot;</span><span class="s2">]</span>
+<span class="s1">usernames </span><span class="s2">= [</span><span class="s4">&quot;ronron&quot;</span><span class="s2">, </span><span class="s4">&quot;gabby&quot;</span><span class="s2">]</span>
+
+<span class="s3"># Load hashed passwords</span>
+<span class="s1">file_path </span><span class="s2">= </span><span class="s1">Path</span><span class="s2">(</span><span class="s1">__file__</span><span class="s2">).</span><span class="s1">parent </span><span class="s2">/ </span><span class="s4">&quot;hashed_pw.pkl&quot;</span>
+<span class="s0">with </span><span class="s1">file_path</span><span class="s2">.</span><span class="s1">open</span><span class="s2">(</span><span class="s4">&quot;rb&quot;</span><span class="s2">) </span><span class="s0">as </span><span class="s1">file</span><span class="s2">:</span>
+    <span class="s1">hashed_passwords </span><span class="s2">= </span><span class="s1">pickle</span><span class="s2">.</span><span class="s1">load</span><span class="s2">(</span><span class="s1">file</span><span class="s2">)</span>
+
+<span class="s3"># Initialize authenticator</span>
+<span class="s1">authenticator </span><span class="s2">= </span><span class="s1">stauth</span><span class="s2">.</span><span class="s1">Authenticate</span><span class="s2">(</span>
+    <span class="s1">names</span><span class="s2">,</span>
+    <span class="s1">usernames</span><span class="s2">,</span>
+    <span class="s1">hashed_passwords</span><span class="s2">,</span>
+    <span class="s4">&quot;flood_prediction&quot;</span><span class="s2">,  </span><span class="s3"># Cookie name</span>
+    <span class="s4">&quot;abcdef&quot;</span><span class="s2">,  </span><span class="s3"># Cookie key (used for encryption)</span>
+    <span class="s1">cookie_expiry_days</span><span class="s2">=</span><span class="s5">30</span>
+<span class="s2">)</span>
+
+<span class="s3"># Login</span>
+<span class="s1">name</span><span class="s2">, </span><span class="s1">authenticator_status</span><span class="s2">, </span><span class="s1">username </span><span class="s2">= </span><span class="s1">authenticator</span><span class="s2">.</span><span class="s1">login</span><span class="s2">(</span><span class="s4">&quot;Login&quot;</span><span class="s2">, </span><span class="s4">&quot;main&quot;</span><span class="s2">)</span>
+
+<span class="s3"># Handle login status</span>
+<span class="s0">if </span><span class="s1">authenticator_status </span><span class="s0">is False</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">error</span><span class="s2">(</span><span class="s4">&quot;Username/password is incorrect&quot;</span><span class="s2">)</span>
+
+<span class="s0">elif </span><span class="s1">authenticator_status </span><span class="s0">is None</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s4">&quot;Please enter your username and password&quot;</span><span class="s2">)</span>
+
+<span class="s0">elif </span><span class="s1">authenticator_status </span><span class="s0">is True</span><span class="s2">:</span>
+    <span class="s0">def </span><span class="s1">load_model</span><span class="s2">():</span>
+        <span class="s0">with </span><span class="s1">open</span><span class="s2">(</span><span class="s4">'saved_steps.pkl'</span><span class="s2">, </span><span class="s4">'rb'</span><span class="s2">) </span><span class="s0">as </span><span class="s1">file</span><span class="s2">:</span>
+            <span class="s1">data </span><span class="s2">= </span><span class="s1">pickle</span><span class="s2">.</span><span class="s1">load</span><span class="s2">(</span><span class="s1">file</span><span class="s2">)</span>
+        <span class="s0">return </span><span class="s1">data</span>
+
+
+    <span class="s1">data </span><span class="s2">= </span><span class="s1">load_model</span><span class="s2">()</span>
+
+    <span class="s1">regressor </span><span class="s2">= </span><span class="s1">data</span><span class="s2">[</span><span class="s4">&quot;model&quot;</span><span class="s2">]</span>
+
+
+    <span class="s0">def </span><span class="s1">show_predict_page</span><span class="s2">():</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;&quot;&quot;### We need some information to predict the probability of flooding&quot;&quot;&quot;</span><span class="s2">)</span>
+
+        <span class="s1">MonsoonIntensity </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">slider</span><span class="s2">(</span><span class="s4">&quot;Monsoon Intensity&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">16</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s1">key</span><span class="s2">=</span><span class="s4">&quot;Monsoon_Intensity_key&quot;</span><span class="s2">)</span>
+        <span class="s1">TopographyDrainage </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">slider</span><span class="s2">(</span><span class="s4">&quot;Topography Drainage&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">16</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s1">key</span><span class="s2">=</span><span class="s4">&quot;Topography_Drainage_key&quot;</span><span class="s2">)</span>
+        <span class="s1">Urbanization </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">slider</span><span class="s2">(</span><span class="s4">&quot;Urbanization&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">16</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s1">key</span><span class="s2">=</span><span class="s4">&quot;Urbanization_key&quot;</span><span class="s2">)</span>
+        <span class="s1">CoastalVulnerability </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">slider</span><span class="s2">(</span><span class="s4">&quot;Coastal Vulnerability&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">16</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s1">key</span><span class="s2">=</span><span class="s4">&quot;Coastal_Vulnerability_key&quot;</span><span class="s2">)</span>
+        <span class="s1">Landslides </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">slider</span><span class="s2">(</span><span class="s4">&quot;Landslides&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">16</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s1">key</span><span class="s2">=</span><span class="s4">&quot;Landslides_key&quot;</span><span class="s2">)</span>
+
+        <span class="s1">ok </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s4">&quot;Calculate Probability&quot;</span><span class="s2">)</span>
+        <span class="s0">if </span><span class="s1">ok</span><span class="s2">:</span>
+            <span class="s1">X </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">array</span><span class="s2">([[</span><span class="s1">MonsoonIntensity</span><span class="s2">, </span><span class="s1">TopographyDrainage</span><span class="s2">, </span><span class="s1">Urbanization</span><span class="s2">, </span><span class="s1">CoastalVulnerability</span><span class="s2">, </span><span class="s1">Landslides</span><span class="s2">]])</span>
+
+            <span class="s1">probability </span><span class="s2">= </span><span class="s1">regressor</span><span class="s2">.</span><span class="s1">predict</span><span class="s2">(</span><span class="s1">X</span><span class="s2">)</span>
+            <span class="s0">global </span><span class="s1">value</span>
+            <span class="s1">value </span><span class="s2">= </span><span class="s1">probability</span><span class="s2">[</span><span class="s5">0</span><span class="s2">] * </span><span class="s5">100</span>
+            <span class="s0">global </span><span class="s1">text</span>
+            <span class="s1">text </span><span class="s2">= (</span><span class="s4">f&quot;The probability of flooding is </span><span class="s0">{</span><span class="s1">probability</span><span class="s2">[</span><span class="s5">0</span><span class="s2">] * </span><span class="s5">100</span><span class="s0">:</span><span class="s4">.0f</span><span class="s0">}</span><span class="s4">%&quot;</span><span class="s2">)</span>
+
+
+    <span class="s0">def </span><span class="s1">get_coordinates</span><span class="s2">(</span><span class="s1">city_name</span><span class="s2">):</span>
+        <span class="s1">url </span><span class="s2">= </span><span class="s4">f&quot;https://nominatim.openstreetmap.org/search?q=</span><span class="s0">{</span><span class="s1">city_name</span><span class="s0">}</span><span class="s4">&amp;format=json&amp;limit=1&quot;</span>
+        <span class="s1">headers </span><span class="s2">= {</span><span class="s4">&quot;User-Agent&quot;</span><span class="s2">: </span><span class="s4">&quot;WeatherDashboardApp/1.0 (contact@example.com)&quot;</span><span class="s2">}</span>
+        <span class="s1">response </span><span class="s2">= </span><span class="s1">requests</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">url</span><span class="s2">, </span><span class="s1">headers</span><span class="s2">=</span><span class="s1">headers</span><span class="s2">)</span>
+
+        <span class="s0">if </span><span class="s1">response</span><span class="s2">.</span><span class="s1">status_code </span><span class="s2">== </span><span class="s5">200</span><span class="s2">:</span>
+            <span class="s1">location_data </span><span class="s2">= </span><span class="s1">response</span><span class="s2">.</span><span class="s1">json</span><span class="s2">()</span>
+            <span class="s0">if </span><span class="s1">location_data</span><span class="s2">:</span>
+                <span class="s1">location </span><span class="s2">= </span><span class="s1">location_data</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+                <span class="s0">return </span><span class="s1">float</span><span class="s2">(</span><span class="s1">location</span><span class="s2">[</span><span class="s4">'lat'</span><span class="s2">]), </span><span class="s1">float</span><span class="s2">(</span><span class="s1">location</span><span class="s2">[</span><span class="s4">'lon'</span><span class="s2">])</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s4">&quot;City not found. Try adding the country name (e.g., 'Paris, France').&quot;</span><span class="s2">)</span>
+                <span class="s0">return None</span><span class="s2">, </span><span class="s0">None</span>
+        <span class="s0">else</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">error</span><span class="s2">(</span><span class="s4">f&quot;API request failed with status code </span><span class="s0">{</span><span class="s1">response</span><span class="s2">.</span><span class="s1">status_code</span><span class="s0">}</span><span class="s4">: </span><span class="s0">{</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span>
+            <span class="s0">return None</span><span class="s2">, </span><span class="s0">None</span>
+
+    <span class="s0">def </span><span class="s1">get_weather_data</span><span class="s2">(</span><span class="s1">lat</span><span class="s2">, </span><span class="s1">lon</span><span class="s2">, </span><span class="s1">hours</span><span class="s2">):</span>
+        <span class="s1">url </span><span class="s2">= </span><span class="s4">f&quot;https://api.open-meteo.com/v1/forecast?latitude=</span><span class="s0">{</span><span class="s1">lat</span><span class="s0">}</span><span class="s4">&amp;longitude=</span><span class="s0">{</span><span class="s1">lon</span><span class="s0">}</span><span class="s4">&amp;hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&amp;forecast_days=2&quot;</span>
+        <span class="s1">response </span><span class="s2">= </span><span class="s1">requests</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">url</span><span class="s2">)</span>
+
+        <span class="s0">if </span><span class="s1">response</span><span class="s2">.</span><span class="s1">status_code </span><span class="s2">== </span><span class="s5">200</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s1">response</span><span class="s2">.</span><span class="s1">json</span><span class="s2">()</span>
+        <span class="s0">else</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">error</span><span class="s2">(</span><span class="s4">&quot;Failed to retrieve weather data.&quot;</span><span class="s2">)</span>
+            <span class="s0">return None</span>
+
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;You are logged in.&quot;</span><span class="s2">)</span>
+
+    <span class="s3"># Logout button</span>
+    <span class="s0">if </span><span class="s4">&quot;flood_prediction&quot; </span><span class="s0">in </span><span class="s1">authenticator</span><span class="s2">.</span><span class="s1">cookie_manager</span><span class="s2">.</span><span class="s1">cookies</span><span class="s2">:</span>
+        <span class="s1">authenticator</span><span class="s2">.</span><span class="s1">logout</span><span class="s2">(</span><span class="s4">&quot;Logout&quot;</span><span class="s2">, </span><span class="s4">&quot;sidebar&quot;</span><span class="s2">)</span>
+    <span class="s0">else</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s4">&quot;Logout unavailable (cookie not found).&quot;</span><span class="s2">)</span>
+
+
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;Flood Probability Prediction Model&quot;</span><span class="s2">)</span>
+    <span class="s1">row1_1</span><span class="s2">, </span><span class="s1">row1_2 </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">((</span><span class="s5">3</span><span class="s2">, </span><span class="s5">3</span><span class="s2">))</span>
+
+    <span class="s0">with </span><span class="s1">row1_1</span><span class="s2">:</span>
+        <span class="s1">show_predict_page</span><span class="s2">()</span>
+
+    <span class="s0">with </span><span class="s1">row1_2</span><span class="s2">:</span>
+
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">header</span><span class="s2">(</span><span class="s4">&quot;Result Interpretation&quot;</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">value </span><span class="s2">&gt; </span><span class="s5">60</span><span class="s2">:</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">header</span><span class="s2">(</span><span class="s1">text</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s4">&quot;High Probability of Flooding&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">&quot;Move to higher ground&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;Avoid standing in, swimming in, or driving through flood water. If you're in a vehicle that's filling with water, get onto the roof. If you're trapped in a building, go to the highest level, but don't go into an enclosed space like a loft or attic.&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">&quot;Evacuate&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;If you're told to evacuate, do so.&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">&quot;Stay informed&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;Stay informed of local flood warnings, especially if you live in a flood-prone area.&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">&quot;Prepare an emergency kit&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;Stock an emergency kit with water, nonperishable food, a first-aid kit, flashlights, and extra batteries.&quot;</span><span class="s2">)</span>
+
+            <span class="s0">elif </span><span class="s1">value </span><span class="s2">&lt; </span><span class="s5">60</span><span class="s2">:</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">success</span><span class="s2">(</span><span class="s4">&quot;Low Probability of Flooding&quot;</span><span class="s2">)</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s4">&quot;No recommendation&quot;</span><span class="s2">)</span>
+        <span class="s0">except </span><span class="s1">Exception</span><span class="s2">:</span>
+            <span class="s0">pass</span>
+
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">header</span><span class="s2">(</span><span class="s4">&quot;Bacoor City&quot;</span><span class="s2">)</span>
+    <span class="s1">city_name </span><span class="s2">= </span><span class="s4">&quot;Bacoor City&quot;</span>
+    <span class="s1">forecast_duration </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">slider</span><span class="s2">(</span><span class="s4">&quot;Select forecast duration (hours)&quot;</span><span class="s2">, </span><span class="s1">min_value</span><span class="s2">=</span><span class="s5">12</span><span class="s2">, </span><span class="s1">max_value</span><span class="s2">=</span><span class="s5">48</span><span class="s2">, </span><span class="s1">value</span><span class="s2">=</span><span class="s5">24</span><span class="s2">, </span><span class="s1">step</span><span class="s2">=</span><span class="s5">12</span><span class="s2">)</span>
+    <span class="s1">parameter_options </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">multiselect</span><span class="s2">(</span>
+        <span class="s4">&quot;Choose weather parameters to display:&quot;</span><span class="s2">,</span>
+        <span class="s1">options</span><span class="s2">=[</span><span class="s4">&quot;Temperature (°C)&quot;</span><span class="s2">, </span><span class="s4">&quot;Humidity (%)&quot;</span><span class="s2">, </span><span class="s4">&quot;Wind Speed (m/s)&quot;</span><span class="s2">],</span>
+        <span class="s1">default</span><span class="s2">=[</span><span class="s4">&quot;Temperature (°C)&quot;</span><span class="s2">, </span><span class="s4">&quot;Humidity (%)&quot;</span><span class="s2">]</span>
+    <span class="s2">)</span>
+
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s4">&quot;Get Weather Data&quot;</span><span class="s2">):</span>
+        <span class="s1">lat</span><span class="s2">, </span><span class="s1">lon </span><span class="s2">= </span><span class="s1">get_coordinates</span><span class="s2">(</span><span class="s1">city_name</span><span class="s2">)</span>
+        <span class="s0">if </span><span class="s1">lat </span><span class="s0">and </span><span class="s1">lon</span><span class="s2">:</span>
+            <span class="s1">data </span><span class="s2">= </span><span class="s1">get_weather_data</span><span class="s2">(</span><span class="s1">lat</span><span class="s2">, </span><span class="s1">lon</span><span class="s2">, </span><span class="s1">forecast_duration</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">data</span><span class="s2">:</span>
+                <span class="s1">times </span><span class="s2">= [</span><span class="s1">datetime</span><span class="s2">.</span><span class="s1">now</span><span class="s2">() + </span><span class="s1">timedelta</span><span class="s2">(</span><span class="s1">hours</span><span class="s2">=</span><span class="s1">i</span><span class="s2">) </span><span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s1">forecast_duration</span><span class="s2">)]</span>
+                <span class="s1">df </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">({</span><span class="s4">&quot;Time&quot;</span><span class="s2">: </span><span class="s1">times</span><span class="s2">})</span>
+
+                <span class="s0">if </span><span class="s4">&quot;Temperature (°C)&quot; </span><span class="s0">in </span><span class="s1">parameter_options</span><span class="s2">:</span>
+                    <span class="s1">df</span><span class="s2">[</span><span class="s4">&quot;Temperature (°C)&quot;</span><span class="s2">] = </span><span class="s1">data</span><span class="s2">[</span><span class="s4">'hourly'</span><span class="s2">][</span><span class="s4">'temperature_2m'</span><span class="s2">][:</span><span class="s1">forecast_duration</span><span class="s2">]</span>
+                    <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">f&quot;Temperature Forecast&quot;</span><span class="s2">)</span>
+                    <span class="s1">st</span><span class="s2">.</span><span class="s1">line_chart</span><span class="s2">(</span><span class="s1">df</span><span class="s2">.</span><span class="s1">set_index</span><span class="s2">(</span><span class="s4">&quot;Time&quot;</span><span class="s2">)[</span><span class="s4">&quot;Temperature (°C)&quot;</span><span class="s2">])</span>
+
+                <span class="s0">if </span><span class="s4">&quot;Humidity (%)&quot; </span><span class="s0">in </span><span class="s1">parameter_options</span><span class="s2">:</span>
+                    <span class="s1">df</span><span class="s2">[</span><span class="s4">&quot;Humidity (%)&quot;</span><span class="s2">] = </span><span class="s1">data</span><span class="s2">[</span><span class="s4">'hourly'</span><span class="s2">][</span><span class="s4">'relative_humidity_2m'</span><span class="s2">][:</span><span class="s1">forecast_duration</span><span class="s2">]</span>
+                    <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">f&quot;HumidityForecast&quot;</span><span class="s2">)</span>
+                    <span class="s1">st</span><span class="s2">.</span><span class="s1">line_chart</span><span class="s2">(</span><span class="s1">df</span><span class="s2">.</span><span class="s1">set_index</span><span class="s2">(</span><span class="s4">&quot;Time&quot;</span><span class="s2">)[</span><span class="s4">&quot;Humidity (%)&quot;</span><span class="s2">])</span>
+
+                <span class="s0">if </span><span class="s4">&quot;Wind Speed (m/s)&quot; </span><span class="s0">in </span><span class="s1">parameter_options</span><span class="s2">:</span>
+                    <span class="s1">df</span><span class="s2">[</span><span class="s4">&quot;Wind Speed (m/s)&quot;</span><span class="s2">] = </span><span class="s1">data</span><span class="s2">[</span><span class="s4">'hourly'</span><span class="s2">][</span><span class="s4">'wind_speed_10m'</span><span class="s2">][:</span><span class="s1">forecast_duration</span><span class="s2">]</span>
+                    <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">f&quot;Wind SpeedForecast&quot;</span><span class="s2">)</span>
+                    <span class="s1">st</span><span class="s2">.</span><span class="s1">line_chart</span><span class="s2">(</span><span class="s1">df</span><span class="s2">.</span><span class="s1">set_index</span><span class="s2">(</span><span class="s4">&quot;Time&quot;</span><span class="s2">)[</span><span class="s4">&quot;Wind Speed (m/s)&quot;</span><span class="s2">])</span>
+
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s4">&quot;Current Weather Summary&quot;</span><span class="s2">)</span>
+    <span class="s1">col1</span><span class="s2">, </span><span class="s1">col2</span><span class="s2">, </span><span class="s1">col3 </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">(</span><span class="s5">3</span><span class="s2">)</span>
+    <span class="s1">col1</span><span class="s2">.</span><span class="s1">metric</span><span class="s2">(</span><span class="s4">&quot;🌡️ Temperature&quot;</span><span class="s2">, </span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">data</span><span class="s2">[</span><span class="s4">'hourly'</span><span class="s2">][</span><span class="s4">'temperature_2m'</span><span class="s2">][</span><span class="s5">0</span><span class="s2">]</span><span class="s0">}</span><span class="s4">°C&quot;</span><span class="s2">)</span>
+    <span class="s1">col2</span><span class="s2">.</span><span class="s1">metric</span><span class="s2">(</span><span class="s4">&quot;💧 Humidity&quot;</span><span class="s2">, </span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">data</span><span class="s2">[</span><span class="s4">'hourly'</span><span class="s2">][</span><span class="s4">'relative_humidity_2m'</span><span class="s2">][</span><span class="s5">0</span><span class="s2">]</span><span class="s0">}</span><span class="s4">%&quot;</span><span class="s2">)</span>
+    <span class="s1">col3</span><span class="s2">.</span><span class="s1">metric</span><span class="s2">(</span><span class="s4">&quot;🌬️ Wind Speed&quot;</span><span class="s2">, </span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">data</span><span class="s2">[</span><span class="s4">'hourly'</span><span class="s2">][</span><span class="s4">'wind_speed_10m'</span><span class="s2">][</span><span class="s5">0</span><span class="s2">]</span><span class="s0">} </span><span class="s4">m/s&quot;</span><span class="s2">)</span>
+
+    <span class="s1">row2_1</span><span class="s2">, </span><span class="s1">row2_2</span><span class="s2">, </span><span class="s1">row2_3</span><span class="s2">, </span><span class="s1">row2_4 </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">((</span><span class="s5">2</span><span class="s2">, </span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">))</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">map</span><span class="s2">()</span>
+
+
+
+
+</pre>
+</body>
+</html>

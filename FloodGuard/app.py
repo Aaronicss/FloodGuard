@@ -50,7 +50,7 @@ elif authenticator_status is None:
 
 elif authenticator_status is True:
     def load_model():
-        with open('saved_steps.pkl', 'rb') as file:
+        with open('FloodGuard/saved_steps.pkl', 'rb') as file:
             data = pickle.load(file)
         return data
 

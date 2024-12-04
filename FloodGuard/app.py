@@ -28,7 +28,10 @@ file_path = Path(__file__).parent / "hashed_pw.pkl"
 with file_path.open("rb") as file:
     hashed_passwords = pickle.load(file)
 
-
+def load_model():
+        with open('FloodGuard/saved_steps.pkl', 'rb') as file:
+            data = pickle.load(file)
+        return data
 
 
     data = load_model()

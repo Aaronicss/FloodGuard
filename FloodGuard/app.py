@@ -88,11 +88,6 @@ def get_weather_data(lat, lon, hours):
 
 st.sidebar.write("You are logged in.")
 
-    # Logout button
-if "flood_prediction" in authenticator.cookie_manager.cookies:
-    authenticator.logout("Logout", "sidebar")
-else:
-    st.sidebar.warning("Logout unavailable (cookie not found). Refresh the page")
 
 
 st.title("Flood Probability Prediction Model")

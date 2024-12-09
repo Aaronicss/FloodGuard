@@ -208,6 +208,7 @@ elif authenticator_status is True:
         center={"lat": 14.45, "lon": 120.94},  # Adjust center to your area
         zoom=12
     )
+    st.header("Flood Probability Map of Bacoor City")
     st.plotly_chart(fig)
 
 

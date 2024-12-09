@@ -137,7 +137,7 @@ elif authenticator_status is True:
                 st.subheader("Prepare an emergency kit")
                 st.write("Stock an emergency kit with water, nonperishable food, a first-aid kit, flashlights, and extra batteries.")
     
-            elif value < 50:
+            elif value <= 50:
                 st.header(text)
                 st.success("Low Probability of Flooding")
                 st.write("No recommendation")

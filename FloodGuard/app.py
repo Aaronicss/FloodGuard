@@ -19,36 +19,7 @@ st.set_page_config(
 st.title("Welcome to Flood Guard")
 st.image("FloodGuard/logo.png",width=500)
 
-# --- USER AUTHENTICATION ---
-names = ["Aaron Lazaro", "Gabriel"]
-usernames = ["ronron", "gabby"]
 
-# Load hashed passwords
-file_path = Path(__file__).parent / "hashed_pw.pkl"
-with file_path.open("rb") as file:
-    hashed_passwords = pickle.load(file)
-
-# Initialize authenticator
-authenticator = stauth.Authenticate(
-    names,
-    usernames,
-    hashed_passwords,
-    "flood_prediction",  # Cookie name
-    "abcdef",  # Cookie key (used for encryption)
-    cookie_expiry_days=30
-)
-
-# Login
-name, authenticator_status, username = authenticator.login("Login", "main")
-
-# Handle login status
-if authenticator_status is False:
-    st.error("Username/password is incorrect")
-
-elif authenticator_status is None:
-    st.warning("Please enter your username and password")
-
-elif authenticator_status is True:
     def load_model():
             with open('FloodGuard/saved_steps.pkl', 'rb') as file:
                 data = pickle.load(file)

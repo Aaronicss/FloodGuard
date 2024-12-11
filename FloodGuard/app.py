@@ -2,7 +2,6 @@ import requests
 import streamlit as st
 import pickle
 from pathlib import Path
-import streamlit_authenticator as stauth
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta

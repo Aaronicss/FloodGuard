@@ -176,17 +176,34 @@ fig = px.choropleth_mapbox(
 st.header("Flood Probability Map of Bacoor City")
 st.plotly_chart(fig)
 
-st.header("\nPrioritized allocation:")
-st.subheader("Amount of available resources")
-    resources = st.slider("Resources", 0, 70, 2, key="resources")
+import pandas as pd
+import streamlit as st
+
+st.header("Prioritized Allocation")
+st.subheader("Amount of Available Resources")
+
+# Slider to select the number of resources
+resources = st.slider("Resources", 0, 70, 2, key="resources")
+
+# Button to calculate allocation
 if st.button("Calculate Allocation"):
+    # File path for the CSV
     file_path = "FloodGuard/2024-12-03T11-38_export.csv"
+    
+    # Load the CSV into a DataFrame
     df = pd.read_csv(file_path)
+    
+    # Drop 'Unnamed: 0' column if it exists
     if 'Unnamed: 0' in df.columns:
-    df = df.drop(columns=['Unnamed: 0'])
+        df = df.drop(columns=['Unnamed: 0'])
+    
+    # Convert DataFrame to a list of dictionaries
     barangays = df.to_dict('records')
+    
+    # Sort barangays by 'Flood Probability' in descending order
     barangays_sorted = sorted(barangays, key=lambda x: -x['Flood Probability'])
-    resources = 70
+    
+    # Allocate resources
     allocated_resources = []
     for barangay in barangays_sorted:
         if resources > 0:
@@ -194,9 +211,9 @@ if st.button("Calculate Allocation"):
             resources -= 1
         else:
             break
-
+    
     # Convert the allocated resources to a DataFrame
-    allocated_df = pd.DataFrame(allocated_resources)
-    allocated_df = allocated_df.reset_index(drop=True)
-    # Output the prioritized allocation as a DataFrame
+    allocated_df = pd.DataFrame(allocated_resources).reset_index(drop=True)
+    
+    # Display the allocation as a table
     st.table(allocated_df)

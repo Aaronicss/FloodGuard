@@ -180,4 +180,17 @@ file_path = "FloodGuard/2024-12-03T11-38_export.csv"
 df = pd.read_csv(file_path)
 st.header("Barangay Data from CSV:")
 st.subheader(df.head())
+barangays = df.to_dict('records')
+barangays_sorted = sorted(barangays, key=lambda x: -x['Flood Probability'])
+resources = 70
+allocated_resources = []
+for barangay in barangays_sorted:
+    if resources > 0:
+        allocated_resources.append(barangay)
+        resources -= 1
+    else:
+        break
 
+st.header("\nPrioritized allocation:")
+for b in allocated_resources:
+    st.subheader(f"{b['Barangay']} (Severity: {b['Flood Probability']})")

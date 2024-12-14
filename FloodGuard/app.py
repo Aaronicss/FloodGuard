@@ -176,4 +176,6 @@ fig = px.choropleth_mapbox(
 st.header("Flood Probability Map of Bacoor City")
 st.plotly_chart(fig)
 
+file_path = "/content/2024-12-03T11-38_export.csv"
+st.header("Barangay Data from CSV:")
 

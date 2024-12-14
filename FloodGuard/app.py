@@ -183,7 +183,7 @@ st.header("Prioritized Allocation")
 st.subheader("Amount of Available Resources")
 
 # Slider to select the number of resources
-resources = st.slider("Resources", 0, 70, 2, key="resources")
+resources = st.slider("Resources", 0, 75, 2, key="resources")
 
 # Button to calculate allocation
 if st.button("Calculate Allocation"):

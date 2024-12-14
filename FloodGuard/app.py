@@ -189,6 +189,9 @@ for barangay in barangays_sorted:
     else:
         break
 
-st.header("\nPrioritized allocation:")
-for b in allocated_resources:
-    st.subheader(f"{b['Barangay']} (Severity: {b['Flood Probability']})")
+# Convert the allocated resources to a DataFrame
+allocated_df = pd.DataFrame(allocated_resources)
+
+# Output the prioritized allocation as a DataFrame
+print("\nPrioritized Allocation:")
+print(allocated_df)

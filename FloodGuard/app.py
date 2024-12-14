@@ -177,5 +177,7 @@ st.header("Flood Probability Map of Bacoor City")
 st.plotly_chart(fig)
 
 file_path = "/content/2024-12-03T11-38_export.csv"
+df = pd.read_csv(file_path)
 st.header("Barangay Data from CSV:")
+st.subheader(df.head())
 

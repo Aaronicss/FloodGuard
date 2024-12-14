@@ -193,5 +193,6 @@ for barangay in barangays_sorted:
 allocated_df = pd.DataFrame(allocated_resources)
 
 # Output the prioritized allocation as a DataFrame
-print("\nPrioritized Allocation:")
+st.header("\nPrioritized allocation:")
 print(allocated_df)
+st.table(allocated_df)

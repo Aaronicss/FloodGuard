@@ -178,6 +178,8 @@ st.plotly_chart(fig)
 
 file_path = "FloodGuard/2024-12-03T11-38_export.csv"
 df = pd.read_csv(file_path)
+if 'Unnamed: 0' in df.columns:
+    df = df.drop(columns=['Unnamed: 0'])
 barangays = df.to_dict('records')
 barangays_sorted = sorted(barangays, key=lambda x: -x['Flood Probability'])
 resources = 70
